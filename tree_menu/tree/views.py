@@ -1,7 +1,5 @@
 from django.shortcuts import render
 
-from .models import Menu
 
-
-def menu(request):
-    return render(request, "tree/menu.html")
+def show_menu(request, name):
+    return render(request, "tree/menu.html", {"name": name})
