@@ -1,3 +1,7 @@
 from django.shortcuts import render
 
-# Create your views here.
+from .models import Menu
+
+
+def menu(request):
+    return render(request, "tree/menu.html")
