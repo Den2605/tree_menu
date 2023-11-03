@@ -1,9 +1,9 @@
 from django.urls import path
 
-from . import views
+from tree.views import TreeView
 
 app_name = "tree"
 
 urlpatterns = [
-    path("<str:name>/", views.show_menu, name="draw_menu"),
+    path("tree/", TreeView.as_view(), name="index"),
 ]

@@ -19,6 +19,10 @@ class Menu(models.Model):
         "Ссылка",
         max_length=255,
     )
+    position = models.PositiveSmallIntegerField(
+        "Позиция",
+        default=1,
+    )
 
     def __str__(self):
         return self.name
