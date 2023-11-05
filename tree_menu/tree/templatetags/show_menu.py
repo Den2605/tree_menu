@@ -1,52 +1,49 @@
 from django import template
 from django.shortcuts import get_object_or_404
+from django.urls import resolve
 from django.utils.safestring import mark_safe
 
-from tree.models import Menu
+from tree.models import Item, Menu
 
 register = template.Library()
 
 
-@register.inclusion_tag("tree/tree_menu.html", takes_context=True)
-def draw_menu(context, menu):
-    # items = Menu.objects.filter(name=menu)
-    menu_items = Menu.objects.filter(name=menu)
-    return {"menu": menu_items}
-    # menu_html = _new_get_menu(menu_items)
-    # return mark_safe(menu_html)
+@register.simple_tag(takes_context=True)
+def draw_menu(context, name_menu):
+    tag_name = context["name_menu"]
+    # имя тега совпадает с названием таблицы
+    if tag_name == name_menu:
+        menu = get_object_or_404(Menu, name=name_menu)
+        root_items = Item.objects.filter(parent__isnull=True, menu=menu.id)
+        print(root_items)
+        return mark_safe(_get_menu(root_items))
+
+    # имя тега не совпадает с названием таблицы
+    current_items = Item.objects.filter(name=tag_name)
+    # получаем id меню
+    menu = current_items[0].menu
+    print(menu)
+    root_items = Item.objects.filter(parent=current_items[0].parent)
+    root_items = Item.objects.filter(parent__isnull=True, menu=menu.id)
+    print(current_items[0].parent)
+    print(root_items)
+
+    html_list = _get_menu(root_items)
+
+    return mark_safe(html_list)
 
 
-# # @register.simple_tag
-# @register.inclusion_tag("tree/tree_menu.html", takes_context=True)
-# def draw_menu(context, name):
-#     # print(context)
-#     print(">>>")
-#     # print(name)
-#     menu_items = Menu.objects.filter(name=name)
-#     # menu = get_object_or_404(Menu, name=name)
-#     # new_menu_position = menu.position + 1
-#     # menu_1 = Menu.objects.filter(
-#     #     position__gte=1, position__lte=new_menu_position
-#     # )
-#     # print(menu_items)
-#     return mark_safe(_new_get_menu(menu_items, depth=1, max_depth=2))
-#     # return _new_get_menu(menu_items, depth=1, max_depth=2)
-
-
-# def _new_get_menu(menu_items, depth, max_depth):
-#     if depth > max_depth:
-#         return ""
-#     html = "<ul>"
-#     for item in menu_items:
-#         # print(item)
-#         if item.url:
-#             html += "<li>"
-#             html += f'<a href="{item.url}">{item.name}</a>'
-#             html += "</li>"
-#             # print(html)
-#         if item.heir.exists():
-#             html += _new_get_menu(
-#                 item.heir.all(), depth=depth + 1, max_depth=max_depth
-#             )
-#     html += "</ul>"
-#     return html
+def _get_menu(menu):
+    html = "<ul>"
+    for sub_items in menu:
+        html += "<li>"
+        html += (
+            f'<a href="{sub_items.get_absolute_url()}">{sub_items.name}</a>'
+        )
+        html += "</li>"
+        if sub_items.childrens.exists():
+            html += _get_menu(
+                sub_items.childrens.all(),
+            )
+    html += "</ul>"
+    return html

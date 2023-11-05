@@ -1,12 +1,22 @@
 from django.contrib import admin
-from tree.models import Menu
+
+from tree.models import Item, Menu
 
 
-class MenuAdmin(admin.ModelAdmin):
-    list_display = ("name", "url", "parent")
-    list_filter = ("name",)
-    search_fields = ("name", "url")
+@admin.register(Item)
+class ItemAdmin(admin.ModelAdmin):
+    """Пункты меню."""
+
+    list_display = ("id", "name", "slug", "parent", "menu")
+    list_filter = ("menu",)
+    search_fields = ("name", "slug")
     ordering = ("id",)
 
 
-admin.site.register(Menu, MenuAdmin)
+@admin.register(Menu)
+class MenuAdmin(admin.ModelAdmin):
+    """Меню."""
+
+    list_display = ("id", "name", "slug")
+    search_fields = ("name", "slug")
+    ordering = ("id",)
