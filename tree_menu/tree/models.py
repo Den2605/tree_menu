@@ -22,7 +22,7 @@ class Menu(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return f"/tree/{self.name}/"
+        return f"/tree/{self.slug}/"
 
 
 class Item(models.Model):
@@ -60,4 +60,4 @@ class Item(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return f"/tree/{self.name}/"
+        return f"/tree/{self.slug}/"

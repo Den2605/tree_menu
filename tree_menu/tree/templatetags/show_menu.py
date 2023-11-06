@@ -8,18 +8,19 @@ register = template.Library()
 
 
 @register.simple_tag(takes_context=True)
-def draw_menu(context, name_menu):
-    tag_name = context["name_menu"]
+def draw_menu(context, slug_menu):
+    tag_name = context["slug_menu"]
     # имя тега совпадает с названием таблицы
-    if tag_name == name_menu:
-        menu = get_object_or_404(Menu, name=name_menu)
+    if tag_name == slug_menu:
+        menu = get_object_or_404(Menu, slug=slug_menu)
         root_items = Item.objects.filter(
             parent__isnull=True, menu=menu.id
         ).first()
         return mark_safe(_get_menu(root_items))
 
     # имя тега не совпадает с названием таблицы
-    current_items = Item.objects.filter(name=tag_name).first()
+    # получаем значение текущего подпункта
+    current_items = Item.objects.filter(slug=tag_name).first()
 
     # проверяем сколько есть вложенных элементов
     # если их менее двух, значит отображается вся таблица
@@ -37,7 +38,8 @@ def draw_menu(context, name_menu):
 
     # получаем id меню
     menu = current_items.menu
-    root_items = Item.objects.filter(parent__isnull=True, menu=menu.id)
+
+    root_items = Item.objects.filter(parent__isnull=True, menu=menu)
     if stop_item:
         return mark_safe(_get_menu(root_items[0], stop_item=stop_item))
     return mark_safe(_get_menu(root_items[0]))
