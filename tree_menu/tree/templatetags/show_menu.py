@@ -27,6 +27,8 @@ def draw_menu(context, name_menu):
             stop_item = next_child_current_items[0].name
         else:
             stop_item = None
+    else:
+        stop_item = None
 
     # получаем id меню
     menu = current_items[0].menu
