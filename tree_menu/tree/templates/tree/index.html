@@ -2,13 +2,15 @@
 {% load show_menu %}
 {% block title %} Menu {% endblock %}
 {% block content %}
-  <div class="container py-4">     
+  <div class="container py-5">     
     <h3>
-      <a href="{% url 'tree:tree' 'main_menu' %}">
+      <a href="{% url 'tree:tree' "main_menu" %}">
         Main_menu
       </a>
-      <br>  
+      <br> 
+      {% comment %} <a href="{% url 'tree:tree' slug %}">{{slug}}</a> {% endcomment %}
+      {% comment %} <br>   {% endcomment %}
     </h3>
-  {% draw_menu 'main_menu' %}
+    {% draw_menu 'main_menu' %}
   </div>
 {% endblock %}

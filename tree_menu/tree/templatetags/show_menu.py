@@ -13,14 +13,17 @@ def draw_menu(context, slug_menu):
     # имя тега совпадает с названием таблицы
     if tag_name == slug_menu:
         menu = get_object_or_404(Menu, slug=slug_menu)
-        root_items = Item.objects.filter(
-            parent__isnull=True, menu=menu.id
-        ).first()
-        return mark_safe(_get_menu(root_items))
+        # получаем текущую корневую директорию
+        root_items = Item.objects.filter(parent__isnull=True, menu=menu.id)
+        html = ""
+        for root_item in root_items:
+            html += _get_menu(root_item, html)
+
+        return mark_safe(html)
 
     # имя тега не совпадает с названием таблицы
     # получаем значение текущего подпункта
-    current_items = Item.objects.filter(slug=tag_name).first()
+    current_items = get_object_or_404(Item, slug=tag_name)
 
     # проверяем сколько есть вложенных элементов
     # если их менее двух, значит отображается вся таблица
@@ -39,21 +42,42 @@ def draw_menu(context, slug_menu):
     # получаем id меню
     menu = current_items.menu
 
+    # получаем корневые папки данного меню
     root_items = Item.objects.filter(parent__isnull=True, menu=menu)
-    if stop_item:
-        return mark_safe(_get_menu(root_items[0], stop_item=stop_item))
-    return mark_safe(_get_menu(root_items[0]))
+    html = ""
+    for root_item in root_items:
+        if stop_item:
+            html += _get_item(root_item, html, stop_item=stop_item)
+        else:
+            html += _get_item(root_item, html)
+    return mark_safe(html)
 
 
-def _get_menu(menu, stop_item=None):
+def _get_item(menu, html, stop_item=None):
     html = "<ul>"
     html += "<li>"
     html += f'<a href="{menu.get_absolute_url()}">{menu.name}</a>'
     html += "</li>"
-    if menu.childrens.exists():
-        for sub_item_children in menu.childrens.all():
+    children_items = menu.childrens.all()
+    if children_items.exists():
+        for sub_item_children in children_items:
             if sub_item_children.name == stop_item:
                 return html
-            html += _get_menu(sub_item_children, stop_item=stop_item)
+            html += _get_menu(sub_item_children, html, stop_item=stop_item)
+    html += "</ul>"
+    return html
+
+
+def _get_menu(menu, html, stop_item=None):
+    html = "<ul>"
+    html += "<li>"
+    html += f'<a href="{menu.get_absolute_url()}">{menu.name}</a>'
+    html += "</li>"
+    children_items = menu.childrens.all()
+    if children_items.exists():
+        for sub_item_children in children_items:
+            if sub_item_children.name == stop_item:
+                return html
+            html += _get_menu(sub_item_children, html, stop_item=stop_item)
     html += "</ul>"
     return html

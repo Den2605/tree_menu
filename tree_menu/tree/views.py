@@ -8,6 +8,5 @@ class TreeView(TemplateView):
         context = super().get_context_data(**kwargs)
         # Получить slug меню из URL
         slug_menu = self.kwargs["slug"]
-        print(slug_menu)
         context["slug_menu"] = slug_menu
         return context
