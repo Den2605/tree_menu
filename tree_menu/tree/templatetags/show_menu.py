@@ -13,12 +13,17 @@ def draw_menu(context, name_menu):
     # имя тега совпадает с названием таблицы
     if tag_name == name_menu:
         menu = get_object_or_404(Menu, name=name_menu)
-        root_items = Item.objects.filter(parent__isnull=True, menu=menu.id)
-        return mark_safe(_get_menu(root_items[0]))
+        root_items = Item.objects.filter(
+            parent__isnull=True, menu=menu.id
+        ).first()
+        return mark_safe(_get_menu(root_items))
 
     # имя тега не совпадает с названием таблицы
-    current_items = Item.objects.filter(name=tag_name)
-    child_current_items = Item.objects.filter(parent=current_items[0].id)
+    current_items = Item.objects.filter(name=tag_name).first()
+
+    # проверяем сколько есть вложенных элементов
+    # если их менее двух, значит отображается вся таблица
+    child_current_items = Item.objects.filter(parent=current_items.id)
     if child_current_items.exists():
         next_child_current_items = Item.objects.filter(
             parent=child_current_items[0].id
@@ -31,7 +36,7 @@ def draw_menu(context, name_menu):
         stop_item = None
 
     # получаем id меню
-    menu = current_items[0].menu
+    menu = current_items.menu
     root_items = Item.objects.filter(parent__isnull=True, menu=menu.id)
     if stop_item:
         return mark_safe(_get_menu(root_items[0], stop_item=stop_item))
