@@ -1,6 +1,5 @@
 from django import template
 from django.shortcuts import get_object_or_404
-from django.urls import resolve
 from django.utils.safestring import mark_safe
 
 from tree.models import Item, Menu
@@ -53,17 +52,3 @@ def _get_menu(menu, stop_item=None):
             html += _get_menu(sub_item_children, stop_item=stop_item)
     html += "</ul>"
     return html
-
-
-# def _get_menu(menu, stop_item=None):
-#     html = "<ul>"
-#     for sub_items in menu:
-#         html += "<li>"
-#         html += (
-#             f'<a href="{sub_items.get_absolute_url()}">{sub_items.name}</a>'
-#         )
-#         html += "</li>"
-#         if sub_items.childrens.exists():
-#             html += _get_menu(sub_items.childrens.all(), stop_item=stop_item)
-#     html += "</ul>"
-#     return html
