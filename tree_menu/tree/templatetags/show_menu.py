@@ -14,9 +14,7 @@ def draw_menu(context, name_menu):
     if tag_name == name_menu:
         menu = get_object_or_404(Menu, name=name_menu)
         root_items = Item.objects.filter(parent__isnull=True, menu=menu.id)
-        print(root_items)
         return mark_safe(_get_menu(root_items[0]))
-        # return mark_safe(_get_menu(root_items))
 
     # имя тега не совпадает с названием таблицы
     current_items = Item.objects.filter(name=tag_name)
@@ -32,7 +30,6 @@ def draw_menu(context, name_menu):
 
     # получаем id меню
     menu = current_items[0].menu
-    print(menu)
     root_items = Item.objects.filter(parent__isnull=True, menu=menu.id)
     if stop_item:
         return mark_safe(_get_menu(root_items[0], stop_item=stop_item))
@@ -46,7 +43,6 @@ def _get_menu(menu, stop_item=None):
     html += "</li>"
     if menu.childrens.exists():
         for sub_item_children in menu.childrens.all():
-            print(sub_item_children.name)
             if sub_item_children.name == stop_item:
                 return html
             html += _get_menu(sub_item_children, stop_item=stop_item)
