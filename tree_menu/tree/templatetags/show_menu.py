@@ -9,6 +9,9 @@ register = template.Library()
 
 @register.simple_tag(takes_context=True)
 def draw_menu(context, slug_menu):
+    """
+    Пользовательский тег шаблона для отображения древовидного меню.
+    """
     tag_name = context["slug_menu"]
     menu = get_object_or_404(Menu, slug=slug_menu)
 
@@ -32,6 +35,9 @@ def draw_menu(context, slug_menu):
 
 
 def _get_menu(menu, stop_item=None):
+    """
+    Возвращает html-код для отображения меню.
+    """
     html = "<ul>"
     html += "<li>"
     html += f'<a href="{menu.get_absolute_url()}">{menu.name}</a>'
@@ -46,6 +52,10 @@ def _get_menu(menu, stop_item=None):
 
 
 def _get_stop(current_items):
+    """
+    Определяет неактивный подпункт меню, служит для ограничения вывода
+    пунктов меню таблицы.
+    """
     child_current_items = Item.objects.filter(parent=current_items)
     if child_current_items:
         next_child_current_items = Item.objects.filter(
